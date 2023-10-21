@@ -19,14 +19,23 @@ function App() {
   }
 
   const completeTodo = async (id) => {
-    const data = fetch(API_BASE + "/todo/complete/" + id)
-      .then(res => res.json());
-      setTodos(todos => todos.map(todo => {
-        if(todo._id === data._id) {
-          todo.complete = data.complete;
+    const data = await fetch(API_BASE + "/todo/complete/" + id)//http gets the data from server and puts it into data
+      .then(res => res.json()); //res is the object received from the server and then parses it into a json, also returns a promis
+
+      setTodos(todos => todos.map(todo => {//for each todo in todos array
+        if(todo._id === data._id) {//if the todo with matching id is found
+          todo.complete = data.complete;//update the complete property of that todo with the data.complete value
         }
-        return todo;
-      }))
+        return todo; //returns only that todo that changed values
+      }));
+  }
+
+  const deleteTodo = async (id) => {
+    const data = await fetch(API_BASE + "/todo/delete/" + id, { 
+      method: "DELETE"
+    }).then(res => res.json());
+
+    setTodos(todos => todos.filter(todo => todo._id !== data._id));//filter creates new arr with those todos that were not deleted on and sets it to todos
   }
 
   return (
@@ -41,7 +50,7 @@ function App() {
 
           <div className="text">{ todo.text }</div>
 
-          <div className="delete-todo">x</div>
+          <div className="delete-todo" onClick={() => deleteTodo(todo._id)}>x</div>
         </div>
         ))}
       </div>
