@@ -4,7 +4,7 @@ const API_BASE = "http://localhost:3001";
 
 function App() {
   const [todos, setTodos] = useState([]);
-  const [popupActive, setpopupActive] = useState(false);
+  const [popupActive, setPopupActive] = useState(false);
   const [newTodo, setNewTodo] = useState("");
 
   useEffect(() => {
@@ -38,6 +38,22 @@ function App() {
     setTodos(todos => todos.filter(todo => todo._id !== data._id));//filter creates new arr with those todos that were not deleted on and sets it to todos
   }
 
+  const addTodo = async() => {
+    const data = await fetch(API_BASE + "/todo/new", {
+      method: "POST",//creates a resource to the server
+      headers: {
+        "Content-type": "application/json"
+      },
+      body: JSON.stringify({
+        text: newTodo
+      })
+    }).then(res => res.json());
+
+    setTodos([...todos, data]);//get all current todos and new data and set it
+    setPopupActive(false);//once u add a new todo, set popup to false
+    setNewTodo("");//make it null
+  }
+
   return (
     <div className="App">
       <h1>Welcome, Bryce</h1>
@@ -54,6 +70,25 @@ function App() {
         </div>
         ))}
       </div>
+
+      <div className="addPopup" onClick={() => setPopupActive(true)}>+</div>
+
+      {popupActive ? (
+        <div className="popup">
+          <div className="closePopup" onClick={() => setPopupActive(false)}>x</div>
+          <div className="content">
+            <h3>Add Task</h3>
+            <input 
+              type="text" 
+              className="add-todo-input" 
+              onChange={e => setNewTodo(e.target.value)} 
+              value={newTodo}
+              />
+            <button className="button" onClick={addTodo}>Create Task</button>
+          </div>
+        </div>
+      ) : ''}
+
     </div>
   );
 }
